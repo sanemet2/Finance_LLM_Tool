@@ -1,3 +1,7 @@
+/**
+ * Thin wrapper around spawning the Python yfinance service. Responsible for
+ * serialising payloads, buffering stdout/stderr, and enforcing runtime limits.
+ */
 import { spawn } from "node:child_process";
 import { Buffer } from "node:buffer";
 
@@ -36,6 +40,7 @@ export async function runPythonModule(
     const stdoutChunks: Buffer[] = [];
     const stderrChunks: Buffer[] = [];
 
+    // Accumulate stdout/stderr so we can surface detailed errors/captured data.
     child.stdout?.on("data", (chunk: Buffer) => {
       stdoutChunks.push(chunk);
     });
@@ -50,6 +55,7 @@ export async function runPythonModule(
     });
 
     const timeout = setTimeout(() => {
+      // Kill runaway processes so the agent loop cannot hang indefinitely.
       child.kill("SIGTERM");
       reject(new Error(`Python process timed out after ${timeoutMs}ms`));
     }, timeoutMs);

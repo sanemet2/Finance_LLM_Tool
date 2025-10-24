@@ -14,7 +14,7 @@
    ```bash
    npm run smoke:python
    ```
-   This executes `src/scripts/smokeDownloadPriceHistory.ts` and prints the `{ok,result|error}` payload returned from the bundled yfinance tool.
+   This executes `src/scripts/smokeDownloadPriceHistory.ts` and prints the `{ok,result|error}` payload returned from the bundled yfinance tool. Supply explicit `start`/`end` dates in ISO format when you need a precise range.
 4. Ask an ad-hoc question through the agent:
    ```bash
    npm run ask -- "How did MSFT trade last week?"

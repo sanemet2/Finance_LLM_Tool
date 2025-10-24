@@ -1,3 +1,7 @@
+/**
+ * CLI helper that takes a user prompt (argv or interactive prompt) and prints
+ * the finance agent's response. Useful for quick manual queries.
+ */
 import readline from "node:readline";
 
 import { generateFinanceAnswer } from "../agent/financeAgent.js";
@@ -31,6 +35,7 @@ async function run() {
 
   const result = await generateFinanceAnswer(prompt);
 
+  // Show only the natural-language answer; callers can inspect `result.raw` if needed.
   console.log(result.text);
 }
 

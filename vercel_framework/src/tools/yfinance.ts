@@ -1,3 +1,8 @@
+/**
+ * TypeScript facade for the Python yfinance service. Validates tool inputs with
+ * Zod, invokes the bridge, and re-parses the `{ok|error}` envelope so callers
+ * receive structured results.
+ */
 import { z } from "zod";
 
 import { runPythonModule } from "./pythonBridge.js";
@@ -6,7 +11,6 @@ import { pythonToolPath, pythonToolRoot } from "../config/paths.js";
 const PERIOD_CHOICES = [
   "1d",
   "5d",
-  "7d",
   "1mo",
   "3mo",
   "6mo",
@@ -118,15 +122,14 @@ export async function invokeYFinanceOperation<T extends YFinanceOperation>(
   input: unknown,
 ): Promise<YFinanceResponse<unknown>> {
   const schema = ALL_OPERATION_SCHEMAS[operation];
-  let params = schema.parse(input) as any;
-  if (params && typeof params === "object" && "period" in params && params.period === "7d") {
-    params.period = "5d";
-  }
+  const params = schema.parse(input);
 
   const { stdout } = await runPythonModule(
     pythonToolPath,
     { operation, params },
     {
+      // Ensure relative imports/files inside the Python project resolve
+      // exactly as they do when running from the command line.
       cwd: pythonToolRoot,
     },
   );
