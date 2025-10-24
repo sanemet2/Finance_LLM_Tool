@@ -1,0 +1,28 @@
+{
+  "name": "finance-vercel-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx --env-file=.env src/index.ts",
+    "smoke:python": "tsx src/scripts/smokeDownloadPriceHistory.ts",
+    "ask": "tsx --env-file=.env src/scripts/askQuestion.ts",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint . --ext .ts",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^1.0.0",
+    "ai": "^5.0.0",
+    "dotenv": "^17.2.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "tsx": "^4.15.7",
+    "typescript": "^5.6.2",
+    "vitest": "^1.6.0"
+  }
+}
