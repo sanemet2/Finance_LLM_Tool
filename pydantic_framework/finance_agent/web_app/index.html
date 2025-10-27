@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Finance Agent Chat</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg-start: #0f172a;
+        --bg-end: #1e293b;
+        --accent: #38bdf8;
+        --accent-dark: #0ea5e9;
+        --border: rgba(148, 163, 184, 0.25);
+        --card-bg: rgba(15, 23, 42, 0.75);
+        --assistant-bg: rgba(148, 163, 184, 0.14);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --error: #f87171;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top, rgba(56, 189, 248, 0.15), transparent 55%),
+          radial-gradient(circle at bottom, rgba(168, 85, 247, 0.08), transparent 55%),
+          linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        color: var(--text);
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        padding: 32px 16px;
+      }
+
+      .page {
+        width: 100%;
+        max-width: 840px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 560px;
+        line-height: 1.5;
+      }
+
+      .chat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(22px);
+        box-shadow: 0 30px 60px rgba(15, 23, 42, 0.45);
+        min-height: 540px;
+      }
+
+      .chat-log {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding-right: 6px;
+      }
+
+      .message {
+        max-width: min(75%, 520px);
+        padding: 14px 18px;
+        border-radius: 18px;
+        font-size: 0.97rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+        position: relative;
+      }
+
+      .message.user {
+        margin-left: auto;
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: #0f172a;
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 12px 24px rgba(14, 165, 233, 0.3);
+      }
+
+      .message.assistant {
+        background: var(--assistant-bg);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-bottom-left-radius: 6px;
+        color: var(--text);
+      }
+
+      .message.assistant.error {
+        border-color: rgba(248, 113, 113, 0.4);
+        color: var(--error);
+      }
+
+      .chat-input {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(148, 163, 184, 0.16);
+      }
+
+      .chat-input textarea {
+        flex: 1;
+        resize: none;
+        min-height: 52px;
+        max-height: 160px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.65);
+        color: var(--text);
+        font-family: inherit;
+        font-size: 0.98rem;
+        line-height: 1.5;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .chat-input textarea:focus-visible {
+        border-color: var(--accent);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+      }
+
+      .chat-input button {
+        align-self: flex-end;
+        padding: 14px 24px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        box-shadow: 0 14px 30px rgba(56, 189, 248, 0.32);
+      }
+
+      .chat-input button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .chat-input button:not(:disabled):hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 34px rgba(56, 189, 248, 0.42);
+      }
+
+      @media (max-width: 720px) {
+        .chat-card {
+          padding: 22px;
+          border-radius: 20px;
+        }
+
+        .message {
+          max-width: 100%;
+        }
+
+        .chat-input {
+          flex-direction: column;
+        }
+
+        .chat-input button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1>Finance Copilot</h1>
+        <p>
+          Ask for market context, risk insights, or company fundamentals. Responses stream back in real time from the
+          Pydantic AI agent.
+        </p>
+      </header>
+
+      <section class="chat-card">
+        <div class="chat-log" data-chat-log>
+          <div class="message assistant">
+            👋 Hi there! I can summarise tickers, fetch price history, or dig into fundamentals. Ask me about the markets.
+          </div>
+        </div>
+
+        <form class="chat-input" data-chat-form>
+          <textarea
+            name="prompt"
+            placeholder="Ask something like “How have NVDA and AMD performed this quarter?”"
+            rows="1"
+            required
+          ></textarea>
+          <button type="submit">Send</button>
+        </form>
+      </section>
+    </div>
+
+    <script>
+      (() => {
+        const form = document.querySelector("[data-chat-form]");
+        const textarea = form.querySelector("textarea");
+        const sendButton = form.querySelector("button");
+        const chatLog = document.querySelector("[data-chat-log]");
+        const decoder = new TextDecoder();
+        let isStreaming = false;
+
+        function appendMessage(role, text) {
+          const bubble = document.createElement("div");
+          bubble.className = `message ${role}`;
+          bubble.textContent = text;
+          chatLog.appendChild(bubble);
+          chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: "smooth" });
+          return bubble;
+        }
+
+        function setStreamingState(active) {
+          isStreaming = active;
+          sendButton.disabled = active;
+          textarea.disabled = active;
+          if (!active) {
+            textarea.value = "";
+            autoResize();
+            textarea.focus();
+          }
+        }
+
+        function autoResize() {
+          textarea.style.height = "auto";
+          textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`;
+        }
+
+        async function streamPrompt(prompt) {
+          appendMessage("user", prompt);
+          const assistantBubble = appendMessage("assistant", "…");
+
+          try {
+            const response = await fetch("/api/chat", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ prompt }),
+            });
+
+            if (!response.ok || !response.body) {
+              throw new Error("The server could not start the stream.");
+            }
+
+            const reader = response.body.getReader();
+            let buffer = "";
+
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, { stream: true });
+
+              let boundary = buffer.indexOf("\n\n");
+              while (boundary !== -1) {
+                const rawEvent = buffer.slice(0, boundary);
+                buffer = buffer.slice(boundary + 2);
+                boundary = buffer.indexOf("\n\n");
+
+                if (!rawEvent.trim()) continue;
+
+                let eventType = "message";
+                let dataPayload = "";
+
+                for (const line of rawEvent.split("\n")) {
+                  if (line.startsWith("event:")) {
+                    eventType = line.slice(6).trim();
+                  } else if (line.startsWith("data:")) {
+                    dataPayload += line.slice(5).trim();
+                  }
+                }
+
+                if (!dataPayload) continue;
+
+                const data = JSON.parse(dataPayload);
+                if (eventType === "delta") {
+                  if (assistantBubble.textContent === "…") assistantBubble.textContent = "";
+                  assistantBubble.textContent += data.text;
+                } else if (eventType === "final") {
+                  assistantBubble.textContent = data.text;
+                } else if (eventType === "error") {
+                  assistantBubble.textContent = `⚠️ ${data.message}`;
+                  assistantBubble.classList.add("error");
+                }
+
+                chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: "smooth" });
+              }
+            }
+          } catch (error) {
+            assistantBubble.textContent = `⚠️ ${error.message || "Something went wrong."}`;
+            assistantBubble.classList.add("error");
+          } finally {
+            setStreamingState(false);
+          }
+        }
+
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          if (isStreaming) return;
+          const prompt = textarea.value.trim();
+          if (!prompt) return;
+          setStreamingState(true);
+          streamPrompt(prompt);
+        });
+
+        textarea.addEventListener("input", autoResize);
+        textarea.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            form.requestSubmit();
+          }
+        });
+
+        autoResize();
+      })();
+    </script>
+  </body>
+</html>
