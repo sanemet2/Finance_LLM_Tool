@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import re
+from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
@@ -69,6 +71,49 @@ class TickerNewsInput(TickerOnlyInput):
     count: Optional[int] = Field(None, gt=0, le=50, description="Optional limit on returned news items")
 
 
+_RELATIVE_PERIOD_PATTERN = re.compile(
+    r"^\s*(?P<amount>\d+)\s*(?P<unit>w|week|weeks|d|day|days)\s*$",
+    re.IGNORECASE,
+)
+
+
+def _normalize_period(payload: dict[str, Any]) -> dict[str, Any]:
+    """Convert relative periods (e.g. `6w`) into explicit start dates for yfinance."""
+
+    period = payload.get("period")
+    if not period:
+        return payload
+
+    normalized = str(period).lower().strip()
+    if normalized in PERIOD_CHOICES:
+        return payload
+
+    match = _RELATIVE_PERIOD_PATTERN.match(normalized)
+    if not match:
+        return payload
+
+    amount = int(match.group("amount"))
+    unit = match.group("unit")
+    if amount <= 0:
+        return payload
+
+    if unit.startswith("w"):
+        delta = timedelta(weeks=amount)
+    elif unit.startswith("d"):
+        delta = timedelta(days=amount)
+    else:  # pragma: no cover - guarded by regex
+        return payload
+
+    end = datetime.now(timezone.utc).date()
+    start = (end - delta).isoformat()
+
+    payload = payload.copy()
+    payload.pop("period", None)
+    payload.setdefault("end", end.isoformat())
+    payload["start"] = start
+    return payload
+
+
 def attach_finance_tools(agent: Agent[FinanceDependencies, Any]) -> None:
     """Register yfinance-backed tools on the supplied agent."""
 
@@ -80,7 +125,7 @@ def attach_finance_tools(agent: Agent[FinanceDependencies, Any]) -> None:
         """Fetch OHLCV price history for a ticker via yfinance."""
 
         service = ctx.deps.yfinance_service
-        payload = params.model_dump(exclude_none=True)
+        payload = _normalize_period(params.model_dump(exclude_none=True))
         return await asyncio.to_thread(service.download_price_history, **payload)
 
     @agent.tool

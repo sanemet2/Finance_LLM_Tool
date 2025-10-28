@@ -17,6 +17,8 @@
         --text: #e2e8f0;
         --muted: #94a3b8;
         --error: #f87171;
+        --success: #34d399;
+        --warning: #facc15;
       }
 
       * {
@@ -39,7 +41,7 @@
 
       .page {
         width: 100%;
-        max-width: 840px;
+        max-width: 1180px;
         display: flex;
         flex-direction: column;
         gap: 20px;
@@ -61,19 +63,29 @@
       header p {
         margin: 0;
         color: var(--muted);
-        max-width: 560px;
+        max-width: 640px;
         line-height: 1.5;
       }
 
-      .chat-card {
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+        gap: 20px;
+      }
+
+      .chat-card,
+      .analytics-card {
         background: var(--card-bg);
         border: 1px solid var(--border);
         border-radius: 24px;
-        padding: 28px;
-        display: flex;
-        flex-direction: column;
+        padding: 24px;
         backdrop-filter: blur(22px);
         box-shadow: 0 30px 60px rgba(15, 23, 42, 0.45);
+      }
+
+      .chat-card {
+        display: flex;
+        flex-direction: column;
         min-height: 540px;
       }
 
@@ -128,99 +140,362 @@
       .chat-input textarea {
         flex: 1;
         resize: none;
-        min-height: 52px;
+        min-height: 56px;
         max-height: 160px;
-        padding: 14px 16px;
         border-radius: 16px;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        background: rgba(15, 23, 42, 0.65);
-        color: var(--text);
-        font-family: inherit;
+        padding: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.6);
+        color: inherit;
         font-size: 0.98rem;
         line-height: 1.5;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition: border-color 0.2s ease;
       }
 
-      .chat-input textarea:focus-visible {
-        border-color: var(--accent);
+      .chat-input textarea:focus {
         outline: none;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+        border-color: rgba(56, 189, 248, 0.6);
+        box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
       }
 
       .chat-input button {
-        align-self: flex-end;
-        padding: 14px 24px;
-        border-radius: 14px;
         border: none;
+        border-radius: 16px;
+        padding: 0 22px;
+        font-weight: 600;
+        font-size: 0.97rem;
         background: linear-gradient(135deg, var(--accent), var(--accent-dark));
         color: #0f172a;
-        font-weight: 600;
-        font-size: 0.95rem;
-        letter-spacing: 0.01em;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-        box-shadow: 0 14px 30px rgba(56, 189, 248, 0.32);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
       }
 
       .chat-input button:disabled {
-        opacity: 0.5;
+        opacity: 0.6;
         cursor: not-allowed;
         box-shadow: none;
       }
 
       .chat-input button:not(:disabled):hover {
         transform: translateY(-1px);
-        box-shadow: 0 18px 34px rgba(56, 189, 248, 0.42);
+        box-shadow: 0 12px 24px rgba(14, 165, 233, 0.28);
       }
 
-      @media (max-width: 720px) {
-        .chat-card {
-          padding: 22px;
-          border-radius: 20px;
+      .analytics-column {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .analytics-card h2 {
+        margin: 0 0 16px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .insight-list,
+      .details-list,
+      .tool-timings,
+      .tool-usage-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .insight-item {
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 14px;
+        padding: 12px 14px;
+        background: rgba(15, 23, 42, 0.55);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .details-item {
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 10px;
+        padding: 12px;
+        background: rgba(15, 23, 42, 0.45);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .details-item-header {
+        font-weight: 600;
+        font-size: 0.92rem;
+      }
+
+      .details-item-meta {
+        font-size: 0.82rem;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      details.tool-summary {
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.55);
+      }
+
+      details.tool-summary > summary {
+        list-style: none;
+        cursor: pointer;
+      }
+
+      details.tool-summary > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .tool-summary-summary {
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .tool-summary-body {
+        padding: 0 14px 12px 14px;
+      }
+
+      details.tool-detail {
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.45);
+      }
+
+      details.tool-detail > summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      details.tool-detail > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .tool-detail-body {
+        padding: 0 12px 12px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .tool-detail-meta {
+        font-size: 0.82rem;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      .analytics-subheading {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        margin-bottom: 10px;
+      }
+
+      .tool-timings,
+      .tool-usage-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .tool-entry {
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 14px;
+        padding: 12px 14px;
+        background: rgba(15, 23, 42, 0.55);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .tool-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: baseline;
+      }
+
+      .tool-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .tool-duration {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .tool-meta {
+        font-size: 0.82rem;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      .status-chip {
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(148, 163, 184, 0.16);
+        color: var(--muted);
+      }
+
+      .status-chip.success {
+        background: rgba(52, 211, 153, 0.18);
+        color: var(--success);
+      }
+
+      .status-chip.warning {
+        background: rgba(250, 204, 21, 0.18);
+        color: var(--warning);
+      }
+
+      .status-chip.error {
+        background: rgba(248, 113, 113, 0.18);
+        color: var(--error);
+      }
+
+      .analytics-summary {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin-bottom: 16px;
+      }
+
+      @media (max-width: 1120px) {
+        .layout {
+          grid-template-columns: minmax(0, 1fr);
         }
 
-        .message {
-          max-width: 100%;
-        }
-
-        .chat-input {
+        .analytics-column {
           flex-direction: column;
         }
+      }
 
-        .chat-input button {
-          width: 100%;
-          justify-content: center;
+      @media (max-width: 640px) {
+        body {
+          padding: 24px 12px;
         }
+
+        .page {
+          gap: 16px;
+        }
+
+        .chat-card,
+        .analytics-card {
+          padding: 20px;
+        }
+
       }
     </style>
   </head>
   <body>
     <div class="page">
       <header>
-        <h1>Finance Copilot</h1>
+        <h1>Finance Agent</h1>
         <p>
-          Ask for market context, risk insights, or company fundamentals. Responses stream back in real time from the
-          Pydantic AI agent.
+          Ask for market context, company fundamentals, or pricing trends. Responses stream in real
+          time with insight into tool usage and latency.
         </p>
       </header>
 
-      <section class="chat-card">
-        <div class="chat-log" data-chat-log>
-          <div class="message assistant">
-            👋 Hi there! I can summarise tickers, fetch price history, or dig into fundamentals. Ask me about the markets.
-          </div>
-        </div>
+      <div class="layout">
+        <section class="chat-card">
+          <div class="chat-log" data-chat-log></div>
+          <form class="chat-input" data-chat-form>
+            <textarea
+              name="prompt"
+              placeholder="Where should I deploy cash if I'm expecting rates to fall next quarter?"
+              autofocus
+              required
+            ></textarea>
+            <button type="submit">Send</button>
+          </form>
+        </section>
 
-        <form class="chat-input" data-chat-form>
-          <textarea
-            name="prompt"
-            placeholder="Ask something like “How have NVDA and AMD performed this quarter?”"
-            rows="1"
-            required
-          ></textarea>
-          <button type="submit">Send</button>
-        </form>
-      </section>
+        <aside class="analytics-column">
+          <section class="analytics-card" data-analytics-module="timings">
+            <h2>Speed Insights</h2>
+            <div class="analytics-subheading">Milestones</div>
+            <ul class="insight-list">
+              <li class="insight-item">
+                <div class="tool-row">
+                  <span class="tool-name">First Token</span>
+                  <span class="tool-duration" data-first-token>--</span>
+                </div>
+                <div class="tool-meta">Latency from prompt submission until the model starts streaming.</div>
+              </li>
+              <li class="insight-item">
+                <div class="tool-row">
+                  <span class="tool-name">LLM Finalized</span>
+                  <span class="tool-duration" data-final-token>--</span>
+                </div>
+                <div class="tool-meta">Elapsed time until the model finishes producing its answer.</div>
+              </li>
+            </ul>
+            <div class="analytics-subheading">Tool Timings</div>
+            <details class="tool-summary" data-tool-summary>
+              <summary>
+                <div class="tool-summary-summary">
+                  <div class="tool-row">
+                    <span class="tool-name">Total Tool Runtime</span>
+                    <span class="tool-duration" data-tool-runtime>--</span>
+                  </div>
+                  <div class="tool-meta">Click to view individual tool durations.</div>
+                  <div class="tool-meta" data-tool-coverage-summary></div>
+                </div>
+              </summary>
+              <div class="tool-summary-body">
+                <ul class="details-list" data-tool-breakdown>
+                  <li class="details-item" data-empty-state>
+                    <div class="details-item-meta">No tool calls executed yet.</div>
+                  </li>
+                </ul>
+              </div>
+            </details>
+            <div class="analytics-subheading">Total Runtime</div>
+            <ul class="insight-list">
+              <li class="insight-item">
+                <div class="tool-row">
+                  <span class="tool-name">Overall Duration</span>
+                  <span class="tool-duration" data-total-duration>--</span>
+                </div>
+                <div class="tool-meta">Measured from prompt submission until the final streamed token.</div>
+              </li>
+            </ul>
+          </section>
+
+          <section class="analytics-card" data-analytics-module="tool-usage">
+            <h2>Tool Coverage</h2>
+            <div class="analytics-summary" data-tools-summary>No run data yet.</div>
+            <ul class="tool-usage-list" data-tools-list>
+              <li class="tool-entry" data-empty-state>
+                <div class="tool-meta">Tool activity will appear here once the agent executes a tool.</div>
+              </li>
+            </ul>
+          </section>
+        </aside>
+      </div>
     </div>
 
     <script>
@@ -232,6 +507,24 @@
         const decoder = new TextDecoder();
         let isStreaming = false;
 
+        let analyticsModules = [];
+
+        function formatDuration(ms) {
+          if (ms === null || ms === undefined) return "--";
+          const value = Number(ms);
+          if (!Number.isFinite(value)) return "--";
+
+          const seconds = value / 1000;
+          if (seconds < 0.01) return "<0.01 s";
+          if (seconds < 10) return `${seconds.toFixed(2)} s`;
+          if (seconds < 60) return `${seconds.toFixed(1)} s`;
+
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds - minutes * 60;
+          const secondsText = remainingSeconds < 10 ? `0${Math.round(remainingSeconds)}` : `${Math.round(remainingSeconds)}`;
+          return `${minutes}:${secondsText} m`;
+        }
+
         function appendMessage(role, text) {
           const bubble = document.createElement("div");
           bubble.className = `message ${role}`;
@@ -239,6 +532,10 @@
           chatLog.appendChild(bubble);
           chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: "smooth" });
           return bubble;
+        }
+
+        function resetAnalytics() {
+          analyticsModules.forEach((module) => module.reset());
         }
 
         function setStreamingState(active) {
@@ -259,7 +556,7 @@
 
         async function streamPrompt(prompt) {
           appendMessage("user", prompt);
-          const assistantBubble = appendMessage("assistant", "…");
+          const assistantBubble = appendMessage("assistant", "...");
 
           try {
             const response = await fetch("/api/chat", {
@@ -303,20 +600,22 @@
 
                 const data = JSON.parse(dataPayload);
                 if (eventType === "delta") {
-                  if (assistantBubble.textContent === "…") assistantBubble.textContent = "";
+                  if (assistantBubble.textContent === "...") assistantBubble.textContent = "";
                   assistantBubble.textContent += data.text;
                 } else if (eventType === "final") {
                   assistantBubble.textContent = data.text;
                 } else if (eventType === "error") {
-                  assistantBubble.textContent = `⚠️ ${data.message}`;
+                  assistantBubble.textContent = `Error: ${data.message}`;
                   assistantBubble.classList.add("error");
+                } else if (eventType === "analytics") {
+                  analyticsModules.forEach((module) => module.handleEvent(data));
                 }
 
                 chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: "smooth" });
               }
             }
           } catch (error) {
-            assistantBubble.textContent = `⚠️ ${error.message || "Something went wrong."}`;
+            assistantBubble.textContent = `Error: ${error.message || "Something went wrong."}`;
             assistantBubble.classList.add("error");
           } finally {
             setStreamingState(false);
@@ -328,6 +627,7 @@
           if (isStreaming) return;
           const prompt = textarea.value.trim();
           if (!prompt) return;
+          resetAnalytics();
           setStreamingState(true);
           streamPrompt(prompt);
         });
@@ -341,6 +641,446 @@
         });
 
         autoResize();
+
+        function createElement(tag, className) {
+          const el = document.createElement(tag);
+          if (className) el.className = className;
+          return el;
+        }
+
+        function describeSummary(summary, fallbackLabel) {
+          if (!summary) return `${fallbackLabel}: not forwarded.`;
+          const length = typeof summary.length === "number" ? summary.length : null;
+          const truncated = summary.truncated === true;
+          const preview = summary.preview ?? "";
+          let text = `${fallbackLabel}: ${preview || "(empty)"}`;
+          if (length !== null) {
+            text += ` (length ${length}${truncated ? ", truncated" : ""})`;
+          } else if (truncated) {
+            text += " (truncated)";
+          }
+          return text;
+        }
+
+        class TimingAnalyticsModule {
+          constructor(root) {
+            this.root = root;
+            this.totalEl = root.querySelector("[data-total-duration]");
+            this.firstEl = root.querySelector("[data-first-token]");
+            this.finalEl = root.querySelector("[data-final-token]");
+            this.toolRuntimeEl = root.querySelector("[data-tool-runtime]");
+            this.breakdownList = root.querySelector("[data-tool-breakdown]");
+            this.summaryDetails = root.querySelector("[data-tool-summary]");
+            this.summaryBadge = root.querySelector("[data-tool-coverage-summary]");
+            this.toolEntries = new Map();
+          }
+
+          reset() {
+            this.totalEl.textContent = "--";
+            this.firstEl.textContent = "--";
+            this.finalEl.textContent = "--";
+            if (this.toolRuntimeEl) this.toolRuntimeEl.textContent = "--";
+            if (this.summaryBadge) this.summaryBadge.textContent = "";
+            if (this.summaryDetails) this.summaryDetails.open = false;
+            if (this.breakdownList) {
+              this.breakdownList.innerHTML = "";
+              const empty = createElement("li", "details-item");
+              empty.dataset.emptyState = "true";
+              const meta = createElement("div", "details-item-meta");
+              meta.textContent = "No tool calls executed yet.";
+              empty.appendChild(meta);
+              this.breakdownList.appendChild(empty);
+            }
+            this.toolEntries.clear();
+          }
+
+          handleEvent(event) {
+            if (!event || typeof event !== "object") return;
+            switch (event.type) {
+              case "phase":
+                if (event.phase === "model_stream") {
+                  if (event.status === "started") {
+                    this.firstEl.textContent = formatDuration(event.timestamp_ms);
+                  } else if (event.status === "finalized") {
+                    this.finalEl.textContent = formatDuration(event.timestamp_ms);
+                  }
+                }
+                break;
+              case "tool_call_started":
+                this.upsertTool({
+                  callId: event.call_id,
+                  toolName: event.tool_name,
+                  startedMs: event.timestamp_ms,
+                  durationMs: null,
+                  completedMs: null,
+                });
+                break;
+              case "tool_call_completed":
+                this.upsertTool({
+                  callId: event.call_id,
+                  toolName: event.tool_name,
+                  startedMs: event.timestamp_ms - (event.duration_ms || 0),
+                  durationMs: event.duration_ms,
+                  completedMs: event.timestamp_ms,
+                  resultSummary: event.result,
+                  forwardedSummary: event.forwarded,
+                });
+                if (event.tool_stats) {
+                  this.updateToolStats(event.tool_stats);
+                }
+                if (event.coverage_counts) {
+                  this.updateCoverageBadge(event.coverage_counts);
+                }
+                break;
+              case "run_summary":
+                if (event.total_duration_ms !== undefined) {
+                  this.totalEl.textContent = formatDuration(event.total_duration_ms);
+                }
+                if (event.first_token_ms !== undefined && event.first_token_ms !== null) {
+                  this.firstEl.textContent = formatDuration(event.first_token_ms);
+                }
+                if (event.final_result_ms !== undefined && event.final_result_ms !== null) {
+                  this.finalEl.textContent = formatDuration(event.final_result_ms);
+                }
+                if (Array.isArray(event.tool_calls)) {
+                  event.tool_calls.forEach((call) => {
+                    this.upsertTool({
+                      callId: call.call_id,
+                      toolName: call.tool_name,
+                      startedMs: call.started_ms,
+                      durationMs: call.duration_ms,
+                      completedMs: call.completed_ms,
+                      resultSummary: call.result,
+                      forwardedSummary: call.forwarded,
+                    });
+                  });
+                }
+                if (event.tool_stats) {
+                  this.updateToolStats(event.tool_stats);
+                }
+                if (event.coverage_counts) {
+                  this.updateCoverageBadge(event.coverage_counts);
+                }
+                break;
+              default:
+                break;
+            }
+          }
+
+          upsertTool(details) {
+            if (!details || !this.breakdownList) return;
+            const {
+              callId,
+              toolName,
+              startedMs,
+              durationMs,
+              completedMs,
+              resultSummary,
+              forwardedSummary,
+            } = details;
+            let entry = this.toolEntries.get(callId);
+            if (!entry) {
+              if (this.breakdownList.querySelector("[data-empty-state]")) {
+                this.breakdownList.innerHTML = "";
+              }
+              const item = createElement("li", "details-item");
+              item.dataset.callId = callId;
+
+              const detail = document.createElement("details");
+              detail.className = "tool-detail";
+
+              const summary = document.createElement("summary");
+              summary.className = "tool-detail-summary";
+
+              const header = createElement("div", "tool-row");
+              const name = createElement("span", "tool-name");
+              name.textContent = toolName || callId;
+              const duration = createElement("span", "tool-duration");
+              duration.textContent = durationMs != null ? formatDuration(durationMs) : "Running";
+              header.appendChild(name);
+              header.appendChild(duration);
+
+              summary.appendChild(header);
+
+              const body = createElement("div", "tool-detail-body");
+              const meta = createElement("div", "tool-detail-meta");
+              meta.textContent =
+                startedMs != null ? `Started @ ${formatDuration(startedMs)}` : "Pending start";
+              const resultEl = createElement("div", "tool-detail-meta");
+              const forwardedEl = createElement("div", "tool-detail-meta");
+
+              body.appendChild(meta);
+              body.appendChild(resultEl);
+              body.appendChild(forwardedEl);
+
+              detail.appendChild(summary);
+              detail.appendChild(body);
+              item.appendChild(detail);
+              this.breakdownList.appendChild(item);
+
+              entry = {
+                item,
+                detail,
+                summary,
+                durationEl: duration,
+                metaEl: meta,
+                resultEl,
+                forwardedEl,
+                toolName: name,
+              };
+              this.toolEntries.set(callId, entry);
+            } else {
+              entry.toolName.textContent = toolName || entry.toolName.textContent;
+            }
+
+            if (durationMs != null) {
+              entry.durationEl.textContent = formatDuration(durationMs);
+            } else {
+              entry.durationEl.textContent = "Running";
+            }
+
+            if (completedMs != null) {
+              entry.metaEl.textContent = `Completed @ ${formatDuration(completedMs)}`;
+            } else if (startedMs != null) {
+              entry.metaEl.textContent = `Started @ ${formatDuration(startedMs)}`;
+            }
+
+            if (entry.resultEl) {
+              entry.resultEl.textContent = describeSummary(resultSummary, "Tool result");
+            }
+            if (entry.forwardedEl) {
+              const forwardedText = describeSummary(forwardedSummary, "Forwarded to model");
+              if (
+                resultSummary &&
+                typeof resultSummary.length === "number" &&
+                forwardedSummary &&
+                typeof forwardedSummary.length === "number"
+              ) {
+                const ratio =
+                  resultSummary.length > 0
+                    ? Math.min(1, forwardedSummary.length / resultSummary.length)
+                    : forwardedSummary.length > 0
+                      ? 1
+                      : 0;
+                const pct = Math.round(ratio * 100);
+                entry.forwardedEl.textContent = `${forwardedText} (coverage ${pct}%)`;
+              } else {
+                entry.forwardedEl.textContent = forwardedText;
+              }
+            }
+          }
+
+          updateToolStats(stats) {
+            if (!stats) {
+              if (this.toolRuntimeEl) this.toolRuntimeEl.textContent = "--";
+              if (this.summaryBadge) this.summaryBadge.textContent = "";
+              return;
+            }
+            if (this.toolRuntimeEl) {
+              const total = stats.total_duration_ms;
+              if (typeof total === "number" && !Number.isNaN(total)) {
+                this.toolRuntimeEl.textContent = formatDuration(total);
+              } else {
+                this.toolRuntimeEl.textContent = "--";
+              }
+            }
+            if (this.summaryBadge) {
+              const totalCalls = stats.total_calls ?? 0;
+              const full = stats.full_coverage ?? 0;
+              const partial = stats.partial_coverage ?? Math.max(0, (stats.completed_calls ?? 0) - full);
+              const pending = stats.pending ?? Math.max(0, totalCalls - full - partial);
+              this.summaryBadge.textContent = `Full ${full} | Partial ${partial} | Pending ${pending} | Total ${totalCalls}`;
+            }
+          }
+
+          updateCoverageBadge(counts) {
+            if (!this.summaryBadge) return;
+            const full = counts.full ?? 0;
+            const partial = counts.partial ?? 0;
+            const pending = counts.pending ?? 0;
+            const total = full + partial + pending;
+            this.summaryBadge.textContent = `Full ${full} | Partial ${partial} | Pending ${pending} | Total ${total}`;
+          }
+        }
+
+        class ToolUsageAnalyticsModule {
+          constructor(root) {
+            this.root = root;
+            this.summaryEl = root.querySelector("[data-tools-summary]");
+            this.listEl = root.querySelector("[data-tools-list]");
+            this.records = new Map();
+          }
+
+          reset() {
+            this.records.clear();
+            this.summaryEl.textContent = "Awaiting tool activity.";
+            this.listEl.innerHTML = "";
+            const empty = createElement("li", "tool-entry");
+            empty.dataset.emptyState = "true";
+            const meta = createElement("div", "tool-meta");
+            meta.textContent = "Tool activity will appear here once the agent executes a tool.";
+            empty.appendChild(meta);
+            this.listEl.appendChild(empty);
+          }
+
+          handleEvent(event) {
+            if (!event || typeof event !== "object") return;
+            if (event.type === "tool_call_started") {
+              this.upsertRecord(event.call_id, {
+                toolName: event.tool_name,
+                args: event.args,
+                completed: false,
+              });
+              this.renderSummary();
+            } else if (event.type === "tool_call_completed") {
+              this.upsertRecord(event.call_id, {
+                toolName: event.tool_name,
+                duration: event.duration_ms,
+                result: event.result,
+                forwarded: event.forwarded,
+                forwardedAllData: event.forwarded_all_data,
+                completed: true,
+              });
+              this.renderSummary();
+            } else if (event.type === "run_summary" && Array.isArray(event.tool_calls)) {
+              event.tool_calls.forEach((call) => {
+                this.upsertRecord(call.call_id, {
+                  toolName: call.tool_name,
+                  duration: call.duration_ms,
+                  result: call.result,
+                  forwarded: call.forwarded,
+                  forwardedAllData: call.forwarded_all_data,
+                  completed: call.completed_ms != null,
+                });
+              });
+              this.renderSummary();
+            }
+          }
+
+          upsertRecord(callId, patch) {
+            let record = this.records.get(callId);
+            if (!record) {
+              if (this.listEl.querySelector("[data-empty-state]")) {
+                this.listEl.innerHTML = "";
+              }
+              record = {
+                callId,
+                toolName: patch.toolName || callId,
+                args: patch.args || null,
+                duration: patch.duration || null,
+                result: patch.result || null,
+                forwarded: patch.forwarded || null,
+                forwardedAllData: patch.forwardedAllData ?? null,
+                completed: patch.completed ?? false,
+                element: this.createRecordElement(),
+              };
+              this.records.set(callId, record);
+              this.listEl.appendChild(record.element);
+            } else {
+              record.toolName = patch.toolName || record.toolName;
+              record.args = patch.args ?? record.args;
+              record.duration = patch.duration ?? record.duration;
+              record.result = patch.result ?? record.result;
+              record.forwarded = patch.forwarded ?? record.forwarded;
+              if (patch.forwardedAllData !== undefined) {
+                record.forwardedAllData = patch.forwardedAllData;
+              }
+              if (patch.completed !== undefined) {
+                record.completed = patch.completed;
+              }
+            }
+            this.renderRecord(record);
+          }
+
+          createRecordElement() {
+            const item = createElement("li", "tool-entry");
+            const header = createElement("div", "tool-row");
+            const name = createElement("span", "tool-name");
+            const status = createElement("span", "status-chip");
+            header.appendChild(name);
+            header.appendChild(status);
+
+            const coverage = createElement("div", "tool-meta");
+            coverage.dataset.coverage = "true";
+
+            const argsMeta = createElement("div", "tool-meta");
+            argsMeta.dataset.metaArgs = "true";
+
+            const resultMeta = createElement("div", "tool-meta");
+            resultMeta.dataset.metaResult = "true";
+
+            item.appendChild(header);
+            item.appendChild(coverage);
+            item.appendChild(argsMeta);
+            item.appendChild(resultMeta);
+            return item;
+          }
+
+          renderRecord(record) {
+            const { element } = record;
+            const nameEl = element.querySelector(".tool-name");
+            const statusEl = element.querySelector(".status-chip");
+            const coverageEl = element.querySelector('[data-coverage="true"]');
+            const argsEl = element.querySelector('[data-meta-args="true"]');
+            const resultEl = element.querySelector('[data-meta-result="true"]');
+
+            nameEl.textContent = record.toolName;
+
+            if (record.completed) {
+              statusEl.textContent = "Completed";
+              statusEl.className = "status-chip success";
+            } else {
+              statusEl.textContent = "Running";
+              statusEl.className = "status-chip";
+            }
+
+            let coverageText = "Coverage: pending";
+            let coverageClass = "status-chip";
+            if (record.forwardedAllData === true) {
+              coverageText = "Coverage: complete";
+              coverageClass = "status-chip success";
+            } else if (record.forwardedAllData === false) {
+              coverageText = "Coverage: partial";
+              coverageClass = "status-chip warning";
+            }
+            coverageEl.innerHTML = "";
+            const coverageChip = createElement("span", coverageClass);
+            coverageChip.textContent = coverageText;
+            coverageEl.appendChild(coverageChip);
+
+            const argsPreview = record.args?.preview || "--";
+            argsEl.textContent = `Args: ${argsPreview}`;
+
+            const forwardedPreview = record.forwarded?.preview || "--";
+            const resultPreview = record.result?.preview || "--";
+            resultEl.textContent = `Forwarded: ${forwardedPreview} | Result: ${resultPreview}`;
+          }
+
+          renderSummary() {
+            const records = Array.from(this.records.values());
+            if (records.length === 0) {
+              this.summaryEl.textContent = "No tool calls executed.";
+              return;
+            }
+            const completed = records.filter((r) => r.completed).length;
+            const fullCoverage = records.filter((r) => r.forwardedAllData === true).length;
+            this.summaryEl.textContent = `Tool calls: ${records.length} | Completed: ${completed} | Full coverage: ${fullCoverage}/${records.length}`;
+          }
+        }
+
+        const analyticsRegistry = {
+          timings: TimingAnalyticsModule,
+          "tool-usage": ToolUsageAnalyticsModule,
+        };
+
+        analyticsModules = Array.from(document.querySelectorAll("[data-analytics-module]"))
+          .map((panel) => {
+            const kind = panel.dataset.analyticsModule;
+            const ModuleCtor = analyticsRegistry[kind];
+            if (!ModuleCtor) return null;
+            return new ModuleCtor(panel);
+          })
+          .filter(Boolean);
       })();
     </script>
   </body>
