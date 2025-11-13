@@ -18,6 +18,7 @@ The root contains two active workspaces. The `agent/` directory houses the finan
 
 ## Coding Style & Naming Conventions
 We inherit the Ruff configuration from `pyproject.toml`: 120-character lines, single quotes for inline strings, Google-style docstrings where required, and strict type annotations (Pyright runs in `strict` mode). Prefer descriptive module names (`agent_config.py`, not `misc.py`) and PascalCase for dataclasses. Imports should group stdlib / third-party / first-party, which `ruff format` and `ruff check --fix` can enforce. Avoid ad-hoc formatting; always run the Makefile targets before committing.
+- When adding new lines of code, append an ASCII arrow comment like `# <-- new code` so reviewers can immediately spot fresh additions; keep these markers unless explicitly told to remove them.
 
 ## Testing Guidelines
 `pytest` lives in `pydantic-ai/tests` with node IDs mirroring package paths (e.g., `tests/agents/test_streaming.py`). Add new tests beside the code they cover and name files `test_<feature>.py`. Use parametrized cases over ad-hoc loops, and keep fixtures reusable. Coverage is collected automatically via `make test`; aim to keep deltas green before opening a PR. Agent-specific smoke tests can live in `agent/tests/` if they rely on custom prompts—mark them with `@pytest.mark.external` when they hit live providers.

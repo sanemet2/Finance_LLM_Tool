@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Orchestrator",
+      "type": "process",
+      "command": "python",
+      "args": ["agent/Orchestrator_Agent.py"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "group": "finance-agent",
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Analytics Monitor",
+      "type": "process",
+      "command": "python",
+      "args": ["agent/analytics.py"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "group": "finance-agent",
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Agent + Analytics",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "Run Orchestrator",
+        "Run Analytics Monitor"
+      ]
+    }
+  ]
+}
